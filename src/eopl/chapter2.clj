@@ -17,6 +17,7 @@
 
 ;; Diff-tree:== (one) | (diff Diff-tree Diff-tree)
 ;; diff: Diff-Tree x Diff-tree -> Diff-tree
+
 (defn diff [x y]
   (list 'diff x y))
 
