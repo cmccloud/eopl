@@ -5,27 +5,27 @@
   "duple: Int x Exp -> ListOf(Exp)
   Returns a list containing n copies of exp"
   [n exp]
-  (into list (repeat n exp)))
+  (repeat n exp))
 
 ;; 1.16 - invert
 (defn invert
   "invert: ListOf(ListOf(x, y)) -> ListOf(ListOf(y,x))
   Returns a list which each 2-list reversed"
   [col]
-  (into list (map reverse col)))
+  (map reverse col))
 
 ;; 1.17 - down
 (defn down
   "down: List -> List
   Wraps parentheses around top-level element of list"
   [col]
-  (into list (map list col)))
+  (map list col))
 
 ;; 1.18 - swapper
 (defn swapper
   "swapper: Sym x Sym x S-list"
   [s1 s2 s-list]
-  (into list (map #(get {s1 s2 s2 s1} % %) s-list)))
+  (map #(get {s1 s2 s2 s1} % %) s-list))
 
 ;; 1.19 - list-set
 (defn list-set
