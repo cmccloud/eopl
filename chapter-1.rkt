@@ -402,6 +402,32 @@ in lst that satisfied the predicate pred, otherwise returns #f."
                #f)))
 
 ;; Exercise 1.24
+(define (every? pred lst)
+  "every?:: Procedure x List => Bool
+usage: (every? pred lst) returns #f if any elements in lst fails to
+satisfy pred, otherwise returns #t."
+  (cond ((null? lst) #t)
+        ((pred (car lst)) (every? pred (cdr lst)))
+        (else #f)))
+
+(define (every?-test)
+  (and (equal? (every? number? '(a b c 3 e)) #f)
+       (equal? (every? number? '(1 2 3 4 5)) #t)))
+
+;; Exercise 1.25
+(define (exists? pred lst)
+  "exists?:: Procedure x List => Bool
+usage: (exists? pred lst) returns #t if any element in lst satisfies
+pred, otherwise returns #f."
+  (cond ((null? lst) #f)
+        ((pred (car lst)) #t)
+        (else (exists? pred (cdr lst)))))
+
+(define (exists?-test)
+  (and (equal? (exists? number? '(a b c 3 e)) #t)
+       (equal? (exists? number? '(a b c d e)) #f)))
+
+;; Exercise 1.26
 (define (up lst)
   "up:: List => List
 usage: (up lst) removes a pair of parentheses from each top-level element
@@ -417,6 +443,7 @@ of lst. If a top-level element is not a list, in it included as is."
        (equal? (up '((x (y)) z))
                '(x (y) z))))
 
+;; Exercise 1.27
 (define (flatten slist)
   "flatten:: Listof(Sym) => Listof(Sym)
 usage: (flatten slist) reutrns a list of the symbols contained in slist
@@ -437,6 +464,7 @@ removes all the inner parentheses from its argument."
        (equal? (flatten '(a b (() (c))))
                '(a b c))))
 
+;; Exercise 1.28
 (define (merge loi1 loi2)
   "merge:: Listof(Int) x Listof(Int) => Listof(Int)
 usage: (merge loi1 loi2) where loi1 and loi2 are lists of integers that are
