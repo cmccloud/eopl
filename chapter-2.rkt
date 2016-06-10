@@ -204,4 +204,45 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
          (equal? (apply-env env-one 'b) 2)
          (equal? (apply-env env-one 'c) 3))))
 
+;; Exercise 2.11
+(define (empty-env)
+  "empty-env:: => Env"
+  null)
 
+(define (extend-env var val env)
+  "extend-env:: Var x SchemeVal x Env => Env"
+  (cons (cons (list var) (list val)) env))
+
+(define (extend-env* vars vals env)
+  "extend-env*:: Listof(Var) x Listof(SchemeVal) x Env => Env
+usage: (extend-env vars vals env) given two equal lenght lists
+of variables and values, sequentially extends env with (var1 val1...varN valN)"
+  (cons (cons vars vals) env))
+
+(define (apply-env env search-var)
+  "apply-env:: Env x Var => SchemeVal"
+  (define (find-binding search-var saved-vars saved-vals)
+    (cond ((null? saved-vars) #f)
+          ((eqv? search-var (car saved-vars))
+           (car saved-vals))
+          (else (find-binding search-var (cdr saved-vars) (cdr saved-vals)))))
+  (cond ((eqv? env (empty-env))
+         (report-no-binding-found search-var))
+        ((pair? env)
+         (let* ((inner-env (car env))
+                (outer-env (cdr env))
+                (saved-vars (car inner-env))
+                (saved-vals (cdr inner-env)))
+           (or (find-binding search-var saved-vars saved-vals)
+               (apply-env outer-env search-var))))))
+
+(define (apply-env-test)
+  (let ((env-one (extend-env
+                  'a 1
+                  (extend-env*
+                   '(b c d) '(2 3 4)
+                   (extend-env
+                    'a 5 (empty-env))))))
+    (and (equal? (apply-env env-one 'a) 1)
+         (equal? (apply-env env-one 'c) 3)
+         (equal? (apply-env env-one 'd) 4))))
