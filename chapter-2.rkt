@@ -293,3 +293,31 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
     (and (equal? (top b) 1)
          (equal? (top c) 2)
          (equal? (top (pop c)) 1))))
+
+;; Exercise 2.13
+(define (empty-env)
+  "empty-env:: => Env"
+  (list (lambda (search-var) (report-no-binding-found search-var))
+        (lambda () #t)))
+
+(define (extend-env saved-var saved-val saved-env)
+  "extend-env:: Var x SchemeVal x Env => Env"
+  (list (lambda (search-var)
+          (if (eqv? search-var saved-var)
+              saved-val
+              (apply-env saved-env search-var)))
+        (lambda () #f)))
+
+(define (apply-env env search-var)
+  "apply-env:: Env x Var => SchemeVal"
+  ((car env) search-var))
+
+(define (empty-env? env)
+  "empty-env?:: Env => Bool"
+  ((cadr env)))
+
+(define (empty-env?-test)
+  (let* ((a (empty-env))
+         (b (extend-env 'a 1 a)))
+    (and (equal? (empty-env? a) #t)
+         (equal? (empty-env? b) #f))))
