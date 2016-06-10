@@ -2,7 +2,7 @@
 (require eopl)
 
 ;;; 2.1 Specifying Data via Interfaces
-;; ******************************************
+;; *****************************************************************************
 
 ;; Exercise 2.1
 (define Base-N 16)
@@ -125,6 +125,8 @@ sum of dt1 and dt2"
 ;;   (top {f}) = v given that {f} = (push v {g})
 
 ;; 2.2.2 Data Structure Representation
+;; *****************************************************************************
+
 ;; Env-exp::= (empty-env) | (extend-env Identifier Scheme-value Env-exp)
 ;; Env::= (empty-env) | (extend-env Var SchemeVal Env)
 (define (empty-env)
@@ -339,3 +341,77 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
          (equal? (has-binding? b 'a) #t)
          (equal? (has-binding? b 'b) #f)
          (equal? (has-binding? c 'b) #t))))
+
+;; 2.3 Interfaces for Recursive Data Types
+;; *****************************************************************************
+;; Constructors
+;;   var-exp:: Var => Lc-exp
+;;   lambda-exp:: Var x Lc-exp => Lc-exp
+;;   app-exp:: Lc-exp x Lc-exp => Lc-exp
+;; Predicates
+;;   var-exp?:: Lc-exp => Bool
+;;   lambda-exp?:: Lc-exp => Bool
+;;   app-exp?:: Lc-exp => Bool
+;; Extractors
+;;   var-exp->var:: Lc-exp => Var
+;;   lambda-exp->bound-var:: Lc-exp => Var
+;;   lambda-exp->body:: Lc-exp => Lc-exp
+;;   app-exp->rator:: Lc-exp => Lc-exp
+;;   app-exp->rand:: Lc-exp => Lc-exp
+(define (occurs-free? search-var exp)
+  "occurs-free?:: Sym x LcExp => Bool"
+  (cond ((var-exp? exp) (eqv? search-var (var-exp->var exp)))
+        ((lambda-exp? exp)
+         (and (not (eqv? search-var (lambda-exp->bound-var exp)))
+              (occurs-free? search-var (lambda-exp->body exp))))
+        (else
+         (or (occurs-free? serach-var (app-exp->rator exp))
+             (occurs-free? search-var (app-exp->rand exp))))))
+
+;; Exercise 2.15
+(define (var-exp var)
+  "var-exp:: Var => LcExp"
+  var)
+
+(define (lambda-exp var exp)
+  "lambda-exp:: Var x LcExp => LcExp"
+  `(lambda (,var) exp))
+
+(define (app-exp exp1 exp2)
+  "app-exp:: LcExp x LcExp => LcExp"
+  `(,exp1 ,exp2))
+
+(define (var-exp? exp)
+  "var-exp?:: LcExp => Bool"
+  (symbol? exp))
+
+(define (lambda-exp? exp)
+  "lambda-exp?:: LcExp => Bool"
+  (eqv? (car exp) 'lambda))
+
+(define (app-exp? exp)
+  "app-exp?:: LcExp => Bool"
+  (and (list? exp)
+       (= (length exp) 2)))
+
+(define (var-exp->var exp)
+  "var-exp->var:: LcExp => Var"
+  exp)
+
+(define (lambda-exp->bound-var exp)
+  "lambda-exp->bound-var:: LcExp => Var"
+  (caadr exp))
+
+(define (lambda-exp->body exp)
+  "lambda-exp->body:: LcExp => LcExp"
+  (caddr exp))
+
+(define (app-exp->rator exp)
+  "app-exp->rator:: LcExp => LcExp"
+  (car exp))
+
+(define (app-exp->rand exp)
+  "app-exp->rand:: LcExp => LcExp"
+  (cadr exp))
+
+
