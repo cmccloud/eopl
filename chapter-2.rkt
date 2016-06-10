@@ -108,4 +108,81 @@ usage: (dt-plus dt1 dt2) returns a Diff-tree whose value is equal to the
 sum of dt1 and dt2"
   `(diff ,dt1 (diff ,(dt-zero) ,dt2)))
 
+;; 2.2.1 The Environmental Interface
+;; Environment Specification
+;; (empty-env) = {0}
+;; (apply-env {f} var) = f(var)
+;; (extend-env var v {}) = {g} where g(var1) = v iff var1 = var, or f(var1)
+
+;; Exercise 2.4
+;; Stack Specification
+;; Constructors:
+;;   (empty-stack) = {0}
+;;   (push v {f}) = {g} such that (pop {g}) = {f} and (top {g}) = v
+;;   (pop {f}) = {0} | {g} given that {g} = (push v {h}) 
+;; Observers:
+;;   (empty-stack? {f}) = #t iff {f} = {0}, #f otherwise
+;;   (top {f}) = v given that {f} = (push v {g})
+
+;; 2.2.2 Data Structure Representation
+;; Env-exp::= (empty-env) | (extend-env Identifier Scheme-value Env-exp)
+;; Env::= (empty-env) | (extend-env Var SchemeVal Env)
+(define (empty-env)
+  "empty-env:: => Env"
+  '(empty-env))
+
+(define (extend-env var val env)
+  "extend-env:: Var x SchemeVal x Env => Env"
+  (list 'extend-env var val env))
+
+(define (apply-env env search-var)
+  "apply-env:: Env x Var => SchemeVal"
+  (cond ((eqv? (car env) 'empty-env)
+         (report-no-binding-found search-var))
+        ((eqv? (car env) 'extend-env)
+         (let ((saved-var (cadr env))
+               (saved-val (caddr env))
+               (saved-env (cadddr env)))
+           (if (eqv? search-var saved-var)
+               saved-val
+               (apply-env saved-env search-var))))
+        (else (report-invalid-env env))))
+
+(define (report-no-binding-found search-var)
+  (eopl:error 'apply-env "No binding for ~s" search-var))
+
+(define (report-invalid-env env)
+  (eopl:error 'apply-env "Bad environment: ~s" env))
+
+;; Exercise 2.5
+(define (empty-env)
+  "empty-env:: => Env"
+  null)
+
+(define (extend-env var val env)
+  "extend-env:: Var x SchemeVal x Env => Env"
+  (cons (cons var val) env))
+
+(define (apply-env env search-var)
+  "apply-env:: Env x Var => SchemeVal"
+  (cond ((eqv? env (empty-env))
+         (report-no-binding-found search-var))
+        ((pair? env)
+         (let* ((inner-env (car env))
+                (outer-env (cdr env))
+                (saved-var (car inner-env))
+                (saved-val (cdr inner-env)))
+           (if (eqv? search-var saved-var)
+               saved-val
+               (apply-env outer-env search-var))))
+        (else (report-invalid-env env))))
+
+(define (env-test)
+  (let ((env-one (extend-env
+                  'a 1 (extend-env
+                        'b 2 (extend-env
+                              'c 3 (empty-env))))))
+    (and (equal? (apply-env env-one 'a) 1)
+         (equal? (apply-env env-one 'c) 3)
+         (equal? (apply-env env-one 'b) 2))))
 
