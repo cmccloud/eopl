@@ -246,3 +246,50 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
     (and (equal? (apply-env env-one 'a) 1)
          (equal? (apply-env env-one 'c) 3)
          (equal? (apply-env env-one 'd) 4))))
+
+;; 2.2.3 Procedural Representation
+(define (empty-env)
+  "empty-env:: => Env"
+  (lambda (search-var) (report-no-binding-found search-var)))
+
+(define (extend-env saved-var saved-val saved-env)
+  "extend-env:: Var x SchemeVal x Env => Env"
+  (lambda (search-var)
+    (if (eqv? search-var saved-var)
+        saved-val
+        (apply-env saved-env search-var))))
+
+(define (apply-env env search-var)
+  "apply-env:: Env x Var => SchemeVal"
+  (env search-var))
+
+;; Exercise 2.12
+(define (empty-stack)
+  "empty-stack:: => Stack"
+  (lambda (command)
+    (cond ((equal? command 'top)
+           (eopl:error 'empty-stack "Stack is empty"))
+          (else (empty-stack)))))
+
+(define (push stack val)
+  "push:: Stack x SchemeVal => Stack"
+  (lambda (command)
+    (cond ((equal? command 'pop) stack)
+          ((equal? command 'top) val)
+          (else (stack val)))))
+
+(define (top stack)
+  "top:: Stack => SchemeVal"
+  (stack 'top))
+
+(define (pop stack)
+  "pop:: Stack => Stack"
+  (stack 'pop))
+
+(define (stack-test)
+  (let* ((a (empty-stack))
+         (b (push a 1))
+         (c (push b 2)))
+    (and (equal? (top b) 1)
+         (equal? (top c) 2)
+         (equal? (top (pop c)) 1))))
