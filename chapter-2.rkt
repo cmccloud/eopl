@@ -186,3 +186,22 @@ sum of dt1 and dt2"
          (equal? (apply-env env-one 'c) 3)
          (equal? (apply-env env-one 'b) 2))))
 
+;; Exercise 2.6 - 2.8 - Skip
+
+;; Exercise 2.10
+(define (extend-env* vars vals env)
+  "extend-env*:: Listof(Var) x Listof(SchemeVal) x Env => Env
+usage: (extend-env vars vals env) given two equal lenght lists
+of variables and values, sequentially extends env with (var1 val1...varN valN)"
+  (foldl (lambda (bindings env)
+           (extend-env (car bindings) (cdr bindings) env))
+         env
+         (map cons vars vals)))
+
+(define (extend-env*-test)
+  (let ((env-one (extend-env* '(a b c) '(1 2 3) (empty-env))))
+    (and (equal? (apply-env env-one 'a) 1)
+         (equal? (apply-env env-one 'b) 2)
+         (equal? (apply-env env-one 'c) 3))))
+
+
