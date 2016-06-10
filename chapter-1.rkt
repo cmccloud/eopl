@@ -679,6 +679,7 @@ the node containing n. If n is not found, returns the empty lst."
                                 ())
                             (31 () ()))))
           '(Right Left Left)))
+
 ;; Exercise 1.35
 (define (tree-map procedure bintree)
   "tree-map:: Procedure x BinTree => BinTree
