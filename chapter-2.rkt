@@ -59,3 +59,53 @@ usage: (fact-big-num bn) calculates the factorial of bn"
         ((is-zero? (predecessor bn)) bn)
         (else (*big-num bn (fact-big-num (predecessor bn))))))
 
+;; Exercise 2.2 - Notes
+
+;; Exercise 2.3
+;; Diff-Tree Specification
+;; Diff-tree::= (one) | (diff Diff-tree Diff-tree)
+(define (dt-one)
+  "dt-one:: => Diff-tree
+usage: (dt-one) produces the dt representing the number 1"
+  '(one))
+
+(define (dt-zero)
+  "dt-zero:: => Diff-tree
+usage: (dt-zero) produces the dt representing the number 0"
+  '(diff (one) (one)))
+
+(define (dt-zero? dt)
+  "dt-zero?:: Diff-tree => Bool
+usage: (dt-zero? dt) returns #t dt is a valid representation of the number 0,
+otherwise returns #f"
+  (cond ((equal? dt '(one)) #f)
+        (else (= (dt->int (cadr dt))
+                 (dt->int (caddr dt))))))
+
+(define (dt->int dt)
+  "dt->int:: Diff-tree => Int
+usgae: (dt->int dt) returns the value of dt, represented as an integer"
+  (if (equal? dt '(one))
+      1
+      (- (dt->int (cadr dt))
+         (dt->int (caddr dt)))))
+
+(define (dt-successor dt)
+  "dt-successor:: Diff-tree => Diff-tree
+usage: (dt-successor dt) returns a Diff-tree whose value is equal to the
+value of dt +1"
+  `(diff ,dt (diff ,(dt-zero) ,(dt-one))))
+
+(define (dt-predecessor dt)
+  "dt-predecessor:: Diff-tree => Diff-tree
+usage: (dt-predecessor dt) returns a Diff-tree whose value is equal to the
+value of dt -1"
+  `(diff ,dt (diff ,(dt-one) ,(dt-zero))))
+
+(define (dt-plus dt1 dt2)
+  "dt-plus:: Diff-tree x Diff-tree => Diff-tree
+usage: (dt-plus dt1 dt2) returns a Diff-tree whose value is equal to the
+sum of dt1 and dt2"
+  `(diff ,dt1 (diff ,(dt-zero) ,dt2)))
+
+
