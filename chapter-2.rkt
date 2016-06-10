@@ -414,4 +414,12 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
   "app-exp->rand:: LcExp => LcExp"
   (cadr exp))
 
+;; Exercise 2.16
+(define (lambda-exp var exp)
+  "lambda-exp:: Var x LcExp => LcExp"
+  `(lambda ,var exp))
+
+(define (lambda-exp->bound-var exp)
+  "lambda-exp->bound-var:: LcExp => Var"
+  (cadr exp))
 
