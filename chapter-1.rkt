@@ -660,6 +660,26 @@ the root that contain the symbol red."
                                                         (leaf 14)))))
           '(red (bar 1 1) (red 2 (quux 2 2)))))
 
+;; Exercise 1.34
+(define (path n bst)
+  "path:: Int x BinTree => ListOf({Left|Right}*)
+usage: (path n bst) returns a list of lefts and rights showing how to find
+the node containing n. If n is not found, returns the empty lst."
+  (define (build-path n bst path)
+    "build-path:: Int x BinTre x List => ListOf({Left|Right}*)"
+    (cond ((null? bst) null)
+          ((= n (car bst)) path)
+          ((> n (car bst)) (build-path n (caddr bst) (append path '(Right))))
+          (else (build-path n (cadr bst) (append path '(Left))))))
+  (build-path n bst null))
+
+(define (path-test)
+  (equal? (path 17 '(14 (7 () (12 () ()))
+                        (26 (20 (17 () ())
+                                ())
+                            (31 () ()))))
+          '(Right Left Left)))
+;; Exercise 1.35
 (define (tree-map procedure bintree)
   "tree-map:: Procedure x BinTree => BinTree
 usage: (tree-map procedure bintree) produces a new bintree where the contents
