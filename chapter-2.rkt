@@ -508,3 +508,51 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
     (check-equal? (move-to-right seq) '(7 (6 5 4 3 2 1) (8 9)))
     (check-equal? (insert-to-left 13 seq) '(6 (13 5 4 3 2 1) (7 8 9)))
     (check-equal? (insert-to-right 13 seq) '(6 (5 4 3 2 1) (13 7 8 9)))))
+
+;; Exercise 2.19
+(define (number->bintree n)
+  "number->bintree:: Int => Bintree"
+  (list n null null))
+
+(define (current-element bt)
+  "current-element:: Bintree => Int"
+  (car bt))
+
+(define (move-to-left-son bt)
+  "move-to-left-son:: Bintree => Bintree"
+  (cadr bt))
+
+(define (move-to-right-son bt)
+  "move-to-right-son:: Bintree => Bintree"
+  (caddr bt))
+
+(define (at-leaf? bt)
+  "at-leaf?:: Bintree => Bool"
+  (null? bt))
+
+(define (insert-to-left n bt)
+  "insert-to-left:: Int x Bintree => Bintree"
+  (list (current-element bt)
+        (list n
+              (move-to-left-son bt)
+              null)
+        (move-to-right-son bt)))
+
+(define (insert-to-right n bt)
+  "insert-to-right:: Int x Bintree => Bintree"
+  (list (current-element bt)
+        (move-to-left-son bt)
+        (list n
+              (move-to-right-son bt)
+              null)))
+
+(define (bintree-test)
+  (let ((t1 (insert-to-right
+             14 (insert-to-left
+                 12 (number->bintree 13)))))
+    (check-equal? (move-to-left-son t1) '(12 () ()))
+    (check-equal? (current-element (move-to-left-son t1)) 12)
+    (check-equal? (at-leaf? (move-to-right-son (move-to-left-son t1))) #t)
+    (check-equal? (insert-to-left 15 t1)
+                  '(13 (15 (12 () ()) ()) (14 () ())))))
+
