@@ -1,5 +1,6 @@
 #lang eopl
 (require eopl)
+(require rackunit)
 
 ;;; 2.1 Specifying Data via Interfaces
 ;; *****************************************************************************
@@ -34,30 +35,30 @@ to big-num -1"
         (else (cons (- (car big-num) 1)
                     (cdr big-num)))))
 
-(define (+big-num bn1 bn2)
-  "+big-num:: Bignum x Bignum => Bignum
-usage: (+big-num bn1 bn2) produces the bignum whose value is equal to the
+(define (add-big-num bn1 bn2)
+  "add-big-num:: Bignum x Bignum => Bignum
+usage: (add-big-num bn1 bn2) produces the bignum whose value is equal to the
 sum of bn1 and bn2"
   (if (is-zero? bn1)
       bn2
-      (+big-num (predecessor bn1) (successor bn2))))
+      (add-big-num (predecessor bn1) (successor bn2))))
 
-(define (*big-num bn1 bn2)
-  "*big-num:: Bignum x Bignum => Bignum
-usage: (*big-num bn1 bn2) produces the bignum whose value is equal to the
+(define (mult-big-num bn1 bn2)
+  "mult-big-num:: Bignum x Bignum => Bignum
+usage: (mult-big-num bn1 bn2) produces the bignum whose value is equal to the
 product of bn1 and bn2"
-  (define (*big-num-helper bn1 bn2 n)
+  (define (mult-big-num-helper bn1 bn2 n)
     (cond ((is-zero? bn1) (zero))
           ((is-zero? (predecessor bn1)) bn2)
-          (else (*big-num-helper (predecessor bn1) (+big-num bn2 n) n))))
-  (*big-num-helper bn1 bn2 bn2))
+          (else (mult-big-num-helper (predecessor bn1) (add-big-num bn2 n) n))))
+  (mult-big-num-helper bn1 bn2 bn2))
 
 (define (fact-big-num bn)
   "fact-big-num:: Bignum => Bignum
 usage: (fact-big-num bn) calculates the factorial of bn"
   (cond ((is-zero? bn) (zero))
         ((is-zero? (predecessor bn)) bn)
-        (else (*big-num bn (fact-big-num (predecessor bn))))))
+        (else (mult-big-num bn (fact-big-num (predecessor bn))))))
 
 ;; Exercise 2.2 - Notes
 
@@ -184,9 +185,9 @@ sum of dt1 and dt2"
                   'a 1 (extend-env
                         'b 2 (extend-env
                               'c 3 (empty-env))))))
-    (and (equal? (apply-env env-one 'a) 1)
-         (equal? (apply-env env-one 'c) 3)
-         (equal? (apply-env env-one 'b) 2))))
+    (check-equal? (apply-env env-one 'a) 1)
+    (check-equal? (apply-env env-one 'c) 3)
+    (check-equal? (apply-env env-one 'b) 2)))
 
 ;; Exercise 2.6 - 2.8 - Skip
 
@@ -200,11 +201,16 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
          env
          (map cons vars vals)))
 
+(let ((env-one (extend-env* '(a b c) '(1 2 3) (empty-env))))
+  (check-equal? (apply-env env-one 'a) 1)
+  (check-equal? (apply-env env-one 'b) 2)
+  (check-equal? (apply-env env-one 'c) 3))
+
 (define (extend-env*-test)
   (let ((env-one (extend-env* '(a b c) '(1 2 3) (empty-env))))
-    (and (equal? (apply-env env-one 'a) 1)
-         (equal? (apply-env env-one 'b) 2)
-         (equal? (apply-env env-one 'c) 3))))
+    (check-equal? (apply-env env-one 'a) 1)
+    (check-equal? (apply-env env-one 'b) 2)
+    (check-equal? (apply-env env-one 'c) 3)))
 
 ;; Exercise 2.11
 (define (empty-env)
@@ -245,9 +251,9 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
                    '(b c d) '(2 3 4)
                    (extend-env
                     'a 5 (empty-env))))))
-    (and (equal? (apply-env env-one 'a) 1)
-         (equal? (apply-env env-one 'c) 3)
-         (equal? (apply-env env-one 'd) 4))))
+    (check-equal? (apply-env env-one 'a) 1)
+    (check-equal? (apply-env env-one 'c) 3)
+    (check-equal? (apply-env env-one 'd) 4)))
 
 ;; 2.2.3 Procedural Representation
 (define (empty-env)
@@ -292,9 +298,9 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
   (let* ((a (empty-stack))
          (b (push a 1))
          (c (push b 2)))
-    (and (equal? (top b) 1)
-         (equal? (top c) 2)
-         (equal? (top (pop c)) 1))))
+    (check-equal? (top b) 1)
+    (check-equal? (top c) 2)
+    (check-equal? (top (pop c)) 1)))
 
 ;; Exercise 2.13 & Exercise 2.14
 (define (empty-env)
@@ -330,17 +336,17 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
 (define (empty-env?-test)
   (let* ((a (empty-env))
          (b (extend-env 'a 1 a)))
-    (and (equal? (empty-env? a) #t)
-         (equal? (empty-env? b) #f))))
+    (check-equal? (empty-env? a) #t)
+    (check-equal? (empty-env? b) #f)))
 
 (define (has-binding?-test)
   (let* ((a (empty-env))
          (b (extend-env 'a 1 a))
          (c (extend-env 'b 2 b)))
-    (and (equal? (has-binding? a 'a) #f)
-         (equal? (has-binding? b 'a) #t)
-         (equal? (has-binding? b 'b) #f)
-         (equal? (has-binding? c 'b) #t))))
+    (check-equal? (has-binding? a 'a) #f)
+    (check-equal? (has-binding? b 'a) #t)
+    (check-equal? (has-binding? b 'b) #f)
+    (check-equal? (has-binding? c 'b) #t)))
 
 ;; 2.3 Interfaces for Recursive Data Types
 ;; *****************************************************************************
@@ -422,4 +428,30 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
 (define (lambda-exp->bound-var exp)
   "lambda-exp->bound-var:: LcExp => Var"
   (cadr exp))
+
+;; Exercise 2.17
+(define (var-exp exp) `(var-exp ,exp))
+
+(define (lambda-exp var exp) `(lambda-exp ,var ,exp))
+
+(define (app-exp rator rand) `(app-exp ,rator ,rand))
+
+(define (var-exp? exp)
+  (and (pair? exp) (eqv? (car exp) 'var-exp)))
+
+(define (lambda-exp? exp)
+  (and (pair? exp) (eqv? (car exp) 'lambda-exp)))
+
+(define (app-exp? exp)
+  (and (pair? exp) (eqv? (car exp) 'app-exp)))
+
+(define (var-exp->var exp) (cadr exp))
+
+(define (lambda-exp->bound-var exp) (cadr exp))
+
+(define (lambda-exp->body exp) (caddr exp))
+
+(define (app-exp->rator exp) (cadr exp))
+
+(define (app-exp->rand exp) (caddr exp))
 
