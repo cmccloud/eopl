@@ -455,3 +455,56 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
 
 (define (app-exp->rand exp) (caddr exp))
 
+;; Exercise 2.18
+;; NodeInSequence::= (Int Listof(Int) Listof(Int))
+(define (number->sequence num)
+  "number->seqeuence:: Int => Sequence"
+  (list num null null))
+
+(define (current-element bidi-seq)
+  "current-element:: Sequence => Int"
+  (car bidi-seq))
+
+(define (at-left-end? bidi-seq)
+  "at-left-end?:: Sequence => Bool"
+  (null? (cadr bidi-seq)))
+
+(define (at-right-end? bidi-seq)
+  "at-right-end?:: Sequence => Bool"
+  (null? (caddr bidi-seq)))
+
+(define (move-to-left bidi-seq)
+  "move-to-left:: Sequence => Sequence"
+  (unless (at-left-end? bidi-seq)
+    (list (car (cadr bidi-seq))
+          (cdr (cadr bidi-seq))
+          (cons (current-element bidi-seq)
+                (caddr bidi-seq)))))
+
+(define (move-to-right bidi-seq)
+  "move-to-right:: Sequence => Sequence"
+  (unless (at-right-end? bidi-seq)
+    (list (car (caddr bidi-seq))
+          (cons (current-element bidi-seq)
+                (cadr bidi-seq))
+          (cdr (caddr bidi-seq)))))
+
+(define (insert-to-left n bidi-seq)
+  "insert-to-left:: Int x Sequence => Sequence"
+  (list (current-element bidi-seq)
+        (cons n (cadr bidi-seq))
+        (caddr bidi-seq)))
+
+(define (insert-to-right n bidi-seq)
+  "insert-to-right:: Int x Sequence => Sequence"
+  (list (current-element bidi-seq)
+        (cadr bidi-seq)
+        (cons n (caddr bidi-seq))))
+
+(define (bidi-seq-test)
+  (let ((seq '(6 (5 4 3 2 1) (7 8 9))))
+    (check-equal? (current-element seq) 6)
+    (check-equal? (move-to-left seq) '(5 (4 3 2 1) (6 7 8 9)))
+    (check-equal? (move-to-right seq) '(7 (6 5 4 3 2 1) (8 9)))
+    (check-equal? (insert-to-left 13 seq) '(6 (13 5 4 3 2 1) (7 8 9)))
+    (check-equal? (insert-to-right 13 seq) '(6 (5 4 3 2 1) (13 7 8 9)))))
