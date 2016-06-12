@@ -543,8 +543,8 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
   (list (current-element bt)
         (move-to-left-son bt)
         (list n
-              (move-to-right-son bt)
-              null)))
+              null
+              (move-to-right-son bt))))
 
 (define (bintree-test)
   (let ((t1 (insert-to-right
@@ -556,3 +556,4 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
     (check-equal? (insert-to-left 15 t1)
                   '(13 (15 (12 () ()) ()) (14 () ())))))
 
+;; Exercise 2.20 - Skip
