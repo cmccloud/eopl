@@ -556,4 +556,9 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
     (check-equal? (insert-to-left 15 t1)
                   '(13 (15 (12 () ()) ()) (14 () ())))))
 
-;; Exercise 2.20 - Skip
+;; Exercise 2.20
+;; Tree:== () | (Sym Tree Tree)
+;; BinTree:== (Context . Tree)
+;; Context:== (Direction . Tree)
+;; Direction:== Left | Right
+
