@@ -562,3 +562,14 @@ of variables and values, sequentially extends env with (var1 val1...varN valN)"
 ;; Context:== (Direction . Tree)
 ;; Direction:== Left | Right
 
+;;; 2.4 A Tool for Defining Recursive Data Types
+;; *****************************************************************************
+(define-datatype lc-exp lc-exp?
+  (var-exp
+   (var identifier?))
+  (lambda-exp
+   (bound-var identifier?)
+   (body lc-exp?))
+  (app-exp
+   (rator lc-exp?)
+   (rand lc-exp?)))
